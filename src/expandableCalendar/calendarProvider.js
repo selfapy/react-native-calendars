@@ -9,7 +9,6 @@ import {xdateToData} from '../interface';
 import styleConstructor from './style';
 import CalendarContext from './calendarContext';
 
-
 const commons = require('./commons');
 const UPDATE_SOURCES = commons.UPDATE_SOURCES;
 const iconDown = require('../img/down.png');
@@ -37,8 +36,10 @@ class CalendarProvider extends Component {
     /** Today button's style */
     todayButtonStyle: PropTypes.oneOfType([PropTypes.object, PropTypes.number, PropTypes.array]),
     /** The opacity for the disabled today button (0-1) */
-    disabledOpacity: PropTypes.number
-  }
+    disabledOpacity: PropTypes.number,
+    /** Today button's style */
+    todayComponent: PropTypes.any
+  };
 
   constructor(props) {
     super(props);
@@ -81,14 +82,14 @@ class CalendarProvider extends Component {
     if (!sameMonth) {
       _.invoke(this.props, 'onMonthChange', xdateToData(XDate(date)), updateSource);
     }
-  }
+  };
 
-  setDisabled = (disabled) => {
+  setDisabled = disabled => {
     if (this.props.showTodayButton && disabled !== this.state.disabled) {
       this.setState({disabled});
       this.animateOpacity(disabled);
     }
-  }
+  };
 
   getButtonIcon(date) {
     if (!this.props.showTodayButton) {
@@ -146,29 +147,22 @@ class CalendarProvider extends Component {
   onTodayPress = () => {
     const today = XDate().toString('yyyy-MM-dd');
     this.setDate(today, UPDATE_SOURCES.TODAY_PRESS);
-  }
+  };
 
   renderTodayButton() {
-    const {disabled, opacity, buttonY, buttonIcon} = this.state;
-    const todayString = XDate.locales[XDate.defaultLocale].today || commons.todayString;
-    const today = todayString.charAt(0).toUpperCase() + todayString.slice(1);
+    const {disabled} = this.state;
 
     return (
-      <Animated.View style={[this.style.todayButtonContainer, {transform: [{translateY: buttonY}]}]}>
-        <TouchableOpacity style={[this.style.todayButton, this.props.todayButtonStyle]} onPress={this.onTodayPress} disabled={disabled}>
-          <Animated.Image style={[this.style.todayButtonImage, {opacity}]} source={buttonIcon}/>
-          <Animated.Text allowFontScaling={false} style={[this.style.todayButtonText, {opacity}]}>{today}</Animated.Text>
-        </TouchableOpacity>
-      </Animated.View>
+      <TouchableOpacity style={[this.props.todayButtonStyle]} onPress={this.onTodayPress} disabled={disabled}>
+        {this.props.todayComponent}
+      </TouchableOpacity>
     );
   }
 
   render() {
     return (
       <CalendarContext.Provider value={this.getProviderContextValue()}>
-        <View style={[{flex: 1}, this.props.style]}>
-          {this.props.children}
-        </View>
+        <View style={[{flex: 1}, this.props.style]}>{this.props.children}</View>
         {this.props.showTodayButton && this.renderTodayButton()}
       </CalendarContext.Provider>
     );
