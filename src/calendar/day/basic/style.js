@@ -36,6 +36,7 @@ export default function styleConstructor(theme = {}) {
       borderRadius: 16
     },
     todayText: {
+      fontWeight: '600',
       color: appStyle.todayTextColor
     },
     selectedText: {
